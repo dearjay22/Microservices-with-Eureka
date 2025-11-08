@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  eureka-service:
+    build: ./eureka-service
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-net
+
+  exchange-service:
+    build: ./exchange-service
+    container_name: exchange-service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - eureka-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - microservices-net
+
+  currency-service:
+    build: ./currency-service
+    container_name: currency-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      - eureka-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - microservices-net
+
+  audit-service:
+    build: ./audit-service
+    container_name: audit-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      - eureka-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge
